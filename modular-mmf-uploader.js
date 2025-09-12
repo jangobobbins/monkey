@@ -27,7 +27,7 @@
             if (window.location.href.includes("myminifactory.com")) {
                 return new PlatformDefaults(
                     "9.00",
-                    '3d, model, models, 3dmodel, 3dmodels, print, prints, 3dprint, 3dprints, printable, 3dprintable, stl, file, files, stlfile, stlfiles, stlmodel, stlmodels, fantasy, models, dnd, d&d, dnd5e, dungeon, dragons, miniature, dndminiature, rpg, ttrpg, tabletop, game, gaming, tabletopminiatures, boardgame, collector, collectible, hobby, paint, painting, minis, sculpt, zbrush, woman, women, female, females, girl, girls, lady, ladies, heroine, heroines, attractive, sexy, hot, busty, curvy, seductive, alluring, beautiful, pretty, form2, form3, formlabs, mars3, mars4, saturn2, saturn3, elegoo, photonmono, mono m5s, anycubic, sonicmini8k, phrozen, halotmage, creality, x10, epax, sl1s, prusa, x1c, p1p, bambulab, presupported, presupports, print-ready',
+                    'female, lady, heroine, attractive, sexy, hot, busty, curvy, seductive, presupported',
                     `<p>Item description:<br>Ready to print pre-supported models</p>
 <p><br>Pack contains:</p>
 <p>1 x __CHARACTER_NAME__ - __CAMPAIGN_NAME__</p>
@@ -40,7 +40,7 @@
             } else if (window.location.href.includes("cults3d.com")) {
                 return new PlatformDefaults(
                     "11.00",
-                    '3d model, models, 3dmodel, 3dmodels, print, prints, 3dprint, 3dprints, printable, 3dprintable, stl, file, files, stlfile, stlfiles, stlmodel, stlmodels, fantasy, models, dnd, d&d, dnd5e, dungeon, dragons, miniature, dndminiature, rpg, ttrpg, tabletop, game, gaming, tabletopminiatures, boardgame, collector, collectible, hobby, paint, painting, minis, sculpt, zbrush, woman, women, female, females, girl, girls, lady, ladies, heroine, heroines, attractive, sexy, hot, busty, curvy, seductive, alluring, beautiful, pretty, presupported, presupports, print-ready',
+                    'female, lady, heroine, attractive, sexy, hot, busty, curvy, seductive, presupported',
                     `Item description:
 Ready to print pre-supported models
 
