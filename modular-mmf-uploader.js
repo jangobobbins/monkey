@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MMF Upload Helper
 // @namespace    http://tampermonkey.net/
-// @version      2024-12-01
+// @version      2025-9-11
 // @description  Automated helper for MyMiniFactory uploads with extensible architecture
 // @author       You
 // @match        https://www.myminifactory.com/*
