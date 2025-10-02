@@ -17,6 +17,7 @@
     let db;
     const dbName = 'campaignDB';
     const imageStore = 'images';
+    const SIDEBAR_CAMPAIGN_NAME_PATH = '#sidebar-nav > div > div.flex.flex-column.kds-gap-y-04.kds-p-04.kds-mb-02 > a > h2';
 
     function openDB() {
         return new Promise((resolve, reject) => {
@@ -549,8 +550,7 @@
     // BUSINESS LOGIC ===========================================================================
     // Parse campaign data from the current webpage
     function parseCampaign() {
-        let campaignName = document.querySelector(
-            "#react-creator-nav > div > div.bg-white.border-grey-500.border-right.h100p.l0.scroll-y.t0.creator-nav-width.fixed.z10 > div > div.pt5.px3.mb4 > a").innerHTML;
+        let campaignName = document.querySelector(SIDEBAR_CAMPAIGN_NAME_PATH).innerHTML;
         let campaignUrl = window.location.protocol + "//" + window.location.hostname + window.location.pathname;
         let campaignUpdateUrl = campaignUrl + "/posts/freeform/new";
 
