@@ -28,43 +28,44 @@
 
     // Go through this array of groups and run all the steps
     let groupNames = [
-        "3D Printing, Models, STL for 3D Printing",
-        "We Love Female Miniatures",
-        "We Love Female Miniatures",
-        "Kickstarters & Patreons for 3D Printing",
-        "3Dmakerdirect",
-        "3D Printing Miniatures",
-        "Female Figure Modellers",
-        "Cody3D",
-        //"Resin 3D Printers",
-        // "3D Printing, Models, STL for 3D Printing",
-        "Black 3D Printers Group",
-        "$$Adult STL's$$",
-        "3D STL Market",
-        "Patreon 3D Printable Miniatures",
-        "STL Collectibles",
-        "3D print stl models",
-        "3D Printing Group",
-        "Miniatures 3D Printing Community",
-        "Sculpting/STL/3D Printing",
-        "3D Printing",
-        "3D printing marketplace stl",
-        "3d model for Stl file printing",
-        "Miniatures 3D Printing Community",
-        "3D and STL files",
-        "STL Nation",
-        "3D Printing ACTUALLY Uncensored",
-        "STL vault",
-        "3D Printing STLs Artist Marketplace",
-        "Sale Stl, Obj and other files for 3D printing directly from the modelers",
-        "3D PRINTING STL MARKET",
-        "3D Printing - Model Marketplace",
-        "3d model for Stl file printing",
-        "3D printing, sculpting and miniatures",
-        "Miniatures 3D Printing Community",
-        "3D printing marketplace stl",
-        "USA 3D Printing & Modeling",
-        "3d sculpting/ 3d printing expert"
+        "OHN"
+        //         "3D Printing, Models, STL for 3D Printing",
+        //         "We Love Female Miniatures",
+        //         "We Love Female Miniatures",
+        //         "Kickstarters & Patreons for 3D Printing",
+        //         "3Dmakerdirect",
+        //         "3D Printing Miniatures",
+        //         "Female Figure Modellers",
+        //         "Cody3D",
+        //         //"Resin 3D Printers",
+        //         // "3D Printing, Models, STL for 3D Printing",
+        //         "Black 3D Printers Group",
+        //         "$$Adult STL's$$",
+        //         "3D STL Market",
+        //         "Patreon 3D Printable Miniatures",
+        //         "STL Collectibles",
+        //         "3D print stl models",
+        //         "3D Printing Group",
+        //         "Miniatures 3D Printing Community",
+        //         "Sculpting/STL/3D Printing",
+        //         "3D Printing",
+        //         "3D printing marketplace stl",
+        //         "3d model for Stl file printing",
+        //         "Miniatures 3D Printing Community",
+        //         "3D and STL files",
+        //         "STL Nation",
+        //         "3D Printing ACTUALLY Uncensored",
+        //         "STL vault",
+        //         "3D Printing STLs Artist Marketplace",
+        //         "Sale Stl, Obj and other files for 3D printing directly from the modelers",
+        //         "3D PRINTING STL MARKET",
+        //         "3D Printing - Model Marketplace",
+        //         "3d model for Stl file printing",
+        //         "3D printing, sculpting and miniatures",
+        //         "Miniatures 3D Printing Community",
+        //         "3D printing marketplace stl",
+        //         "USA 3D Printing & Modeling",
+        //         "3d sculpting/ 3d printing expert"
     ];
 
     // Named listener so we can remove it
@@ -75,9 +76,6 @@
         let selectedElement = document.querySelector(path);
         if (currentStep == SEARCH_BOX_INPUT && selectedElement.tagName != "INPUT") {
             path = calculateJsPath(selectedElement.getElementsByTagName("input")[0]);
-        }
-        if (currentStep == POST_DESCRIPTION_SPAN && selectedElement.tagName != "SPAN") {
-            path = calculateJsPath(selectedElement.getElementsByTagName("span")[0]);
         }
         renderPaths();
         elementPathsArray[currentStep] = path;
@@ -158,9 +156,13 @@
 
         // Update post description
         setTimeout(function () {
-            let editor = getReactFiberFromElement(document.querySelector(elementPathsArray[POST_DESCRIPTION_SPAN]).parentElement.parentElement.parentElement.parentElement);
-            console.log(editor);
-            editor.memoizedProps.onPaste({ clipboardData: { getData: () => document.getElementById("myDescription").value }, preventDefault: () => {}, stopPropagation: () => {} })
+            let el = document.querySelector(elementPathsArray[POST_DESCRIPTION_SPAN]);
+            el.parentElement.dispatchEvent(new InputEvent("input", {
+                bubbles: true,
+                cancelable: true,
+                inputType: "insertText",
+                data: document.getElementById("myDescription").value
+            }));
         }, startMs += 2000);
 
 
@@ -181,9 +183,6 @@
         let selectedElement = document.querySelector(path);
         if (currentStep == SEARCH_BOX_INPUT && selectedElement.tagName != "INPUT") {
             path = calculateJsPath(selectedElement.getElementsByTagName("input")[0]);
-        }
-        if (currentStep == POST_DESCRIPTION_SPAN && selectedElement.tagName != "SPAN") {
-            path = calculateJsPath(selectedElement.getElementsByTagName("span")[0]);
         }
 
         elementPathsArray[currentStep] = path;
