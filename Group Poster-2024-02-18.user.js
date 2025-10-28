@@ -10,7 +10,7 @@
 // @grant        none
 // ==/UserScript==
 
-(function() {
+(function () {
     'use strict';
     const PAGE_POST_SHARE_BTN = 0;
     const SHARE_TO_GROUP_BTN = 1;
@@ -25,6 +25,17 @@
 
     let currentStep = 0;
     let currentGroupName = "";
+    let instructionBanner = null;
+
+    // Step instructions for the banner
+    const stepInstructions = [
+        "Click the SHARE button on the post you want to share",
+        "Click 'Share to a group' option",
+        "Click in the search box to search for groups",
+        "Click on the first group result that appears",
+        "Click in the post description area to edit it",
+        "Click the POST button to share to the group"
+    ];
 
     // Go through this array of groups and run all the steps
     let groupNames = [
@@ -81,32 +92,45 @@
         elementPathsArray[currentStep] = path;
         console.log(currentStep + " " + path);
         document.removeEventListener('click', elementNameListener, false);
+        hideInstructionBanner();
     };
 
 
     function getPathForIndex(index) {
         currentStep = index;
+        updateInstructionBanner(currentStep);
         setTimeout(function () {
             document.addEventListener('click', elementNameListener, false);
         }, 500);
     }
 
-    function replayAll() {
-        for (let i = 0; i < groupNames.length; i++) {
-            setTimeout(function () {
-                doActionsForGroup(groupNames[i]);
-            }, i * 30000);
+    async function replayAll() {
+        for (const groupName of groupNames) {
+            try {
+                await doActionsForGroup(groupName);
+                console.log(`Successfully posted to group: ${groupName}`);
+            } catch (error) {
+                console.error(`Error posting to group: ${groupName}`, error);
+                // Continue to next group even if current one fails
+            }
+
+            // Wait 30 seconds before processing next group (except for the last one)
+            if (groupName !== groupNames[groupNames.length - 1]) {
+                await delay(30000);
+            }
         }
-        alert("All done!");
     }
 
-    function replayOnce() {
-        setTimeout(function () {
-            doActionsForGroup(groupNames[0]);
-        }, 0);
+    async function replayOnce() {
+        try {
+            await doActionsForGroup(groupNames[0]);
+            console.log(`Successfully posted to group: ${groupNames[0]}`);
+        } catch (error) {
+            console.error(`Error posting to group: ${groupNames[0]}`, error);
+        }
     }
 
-    function doActionsForGroup(groupName) {
+    async function doActionsForGroup(groupName) {
         // Fake click event
         let customClickEvent = new MouseEvent('click', {
             bubbles: true,
@@ -116,63 +140,57 @@
         currentGroupName = groupName;
 
         // Click share on post
-        let startMs = 0;
-        setTimeout(function () {
-            let shareEl = document.querySelector(elementPathsArray[PAGE_POST_SHARE_BTN]);
-            shareEl.dispatchEvent(customClickEvent);
-        }, startMs);
+        let shareEl = document.querySelector(elementPathsArray[PAGE_POST_SHARE_BTN]);
+        shareEl.dispatchEvent(customClickEvent);
 
+        // Wait 2 seconds before next action
+        await delay(2000);
 
         // Click share to group
-        setTimeout(function () {
-            let shareToGroupEl = document.querySelector(elementPathsArray[SHARE_TO_GROUP_BTN]);
-            shareToGroupEl.dispatchEvent(customClickEvent);
-        }, startMs += 2000);
+        let shareToGroupEl = document.querySelector(elementPathsArray[SHARE_TO_GROUP_BTN]);
+        shareToGroupEl.dispatchEvent(customClickEvent);
 
+        // Wait 2 seconds before next action
+        await delay(2000);
 
         // Search for group
-        setTimeout(function () {
-            let searchBox = document.querySelector(elementPathsArray[SEARCH_BOX_INPUT]);
-            console.log(searchBox);
-            let lastValue = searchBox.value;
-            searchBox.value = groupName;
-            let event = new Event('input', { bubbles: true });
-            event.simulated = true;
-            let tracker = searchBox._valueTracker;
-            if (tracker) {
-                tracker.setValue(lastValue);
-            }
-            searchBox.dispatchEvent(event);
-        }, startMs += 2000);
+        let searchBox = document.querySelector(elementPathsArray[SEARCH_BOX_INPUT]);
+        let lastValue = searchBox.value;
+        searchBox.value = groupName;
+        let event = new Event('input', { bubbles: true });
+        event.simulated = true;
+        let tracker = searchBox._valueTracker;
+        if (tracker) {
+            tracker.setValue(lastValue);
+        }
+        searchBox.dispatchEvent(event);
 
+        // Wait 2 seconds before next action
+        await delay(2000);
 
         // Share to specific group element
-        setTimeout(function () {
-            let shareToSpecificGroup = document.querySelector(elementPathsArray[FIRST_GROUP_BTN]);
-            console.log(shareToSpecificGroup);
-            shareToSpecificGroup.dispatchEvent(customClickEvent);
-        }, startMs += 2000);
+        let shareToSpecificGroup = document.querySelector(elementPathsArray[FIRST_GROUP_BTN]);
+        shareToSpecificGroup.dispatchEvent(customClickEvent);
 
+        // Wait 2 seconds before next action
+        await delay(2000);
 
         // Update post description
-        setTimeout(function () {
-            let el = document.querySelector(elementPathsArray[POST_DESCRIPTION_SPAN]);
-            el.parentElement.dispatchEvent(new InputEvent("input", {
-                bubbles: true,
-                cancelable: true,
-                inputType: "insertText",
-                data: document.getElementById("myDescription").value
-            }));
-        }, startMs += 2000);
+        let el = document.querySelector(elementPathsArray[POST_DESCRIPTION_SPAN]);
+        el.parentElement.dispatchEvent(new InputEvent("input", {
+            bubbles: true,
+            cancelable: true,
+            inputType: "insertText",
+            data: document.getElementById("myDescription").value
+        }));
 
+        // Wait 2 seconds before next action
+        await delay(2000);
 
         // Click on Post button
-        setTimeout(function () {
-            let postBtn = document.querySelector(elementPathsArray[POST_POST_BTN]);
-            console.log(postBtn);
-            postBtn.dispatchEvent(customClickEvent);
-        }, startMs += 2000);
-        console.log(groupName);
+        let postBtn = document.querySelector(elementPathsArray[POST_POST_BTN]);
+        postBtn.dispatchEvent(customClickEvent);
+
     }
 
 
@@ -191,9 +209,11 @@
         if (currentStep >= 5) {
             document.removeEventListener('click', autoAdvanceClickListener, false);
             currentStep = 0;
+            showCompletionMessage();
             return;
         }
         currentStep++;
+        updateInstructionBanner(currentStep);
     };
 
     function getReactFiberFromElement(element) {
@@ -204,13 +224,112 @@
 
     function autoAdvanceAll() {
         currentStep = 0;
+        updateInstructionBanner(currentStep);
         setTimeout(function () {
             document.addEventListener('click', autoAdvanceClickListener, false);
         }, 500);
     }
 
 
-    // Utility Function
+    // Banner Functions
+    function createInstructionBanner() {
+        if (instructionBanner) {
+            instructionBanner.remove();
+        }
+
+        instructionBanner = document.createElement('div');
+        instructionBanner.style.position = 'fixed';
+        instructionBanner.style.top = '0';
+        instructionBanner.style.left = '0';
+        instructionBanner.style.width = '100%';
+        instructionBanner.style.backgroundColor = '#4267B2';
+        instructionBanner.style.color = 'white';
+        instructionBanner.style.padding = '15px';
+        instructionBanner.style.textAlign = 'center';
+        instructionBanner.style.fontSize = '16px';
+        instructionBanner.style.fontWeight = 'bold';
+        instructionBanner.style.zIndex = '99999';
+        instructionBanner.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)';
+        instructionBanner.style.borderBottom = '3px solid #365899';
+
+        const closeButton = document.createElement('button');
+        closeButton.innerHTML = '×';
+        closeButton.style.position = 'absolute';
+        closeButton.style.right = '15px';
+        closeButton.style.top = '50%';
+        closeButton.style.transform = 'translateY(-50%)';
+        closeButton.style.background = 'none';
+        closeButton.style.border = 'none';
+        closeButton.style.color = 'white';
+        closeButton.style.fontSize = '24px';
+        closeButton.style.cursor = 'pointer';
+        closeButton.style.padding = '0';
+        closeButton.style.width = '30px';
+        closeButton.style.height = '30px';
+        closeButton.onclick = () => hideInstructionBanner();
+
+        instructionBanner.appendChild(closeButton);
+        document.body.appendChild(instructionBanner);
+
+        // Adjust body padding to account for banner
+        document.body.style.paddingTop = '70px';
+
+        return instructionBanner;
+    }
+
+    function updateInstructionBanner(step) {
+        if (!instructionBanner) {
+            createInstructionBanner();
+        }
+
+        const instruction = stepInstructions[step] || "Setup complete!";
+        const stepText = `Step ${step + 1} of ${stepInstructions.length}: ${instruction}`;
+
+        // Clear existing content except close button
+        const closeButton = instructionBanner.querySelector('button');
+        instructionBanner.innerHTML = '';
+        instructionBanner.appendChild(closeButton);
+
+        const textNode = document.createElement('span');
+        textNode.textContent = stepText;
+        instructionBanner.appendChild(textNode);
+    }
+
+    function hideInstructionBanner() {
+        if (instructionBanner) {
+            instructionBanner.remove();
+            instructionBanner = null;
+            document.body.style.paddingTop = '';
+        }
+    }
+
+    function showCompletionMessage() {
+        if (!instructionBanner) {
+            createInstructionBanner();
+        }
+
+        instructionBanner.style.backgroundColor = '#42b883';
+        instructionBanner.style.borderBottom = '3px solid #369870';
+
+        const closeButton = instructionBanner.querySelector('button');
+        instructionBanner.innerHTML = '';
+        instructionBanner.appendChild(closeButton);
+
+        const textNode = document.createElement('span');
+        textNode.textContent = '✓ Setup Complete! You can now use "Replay Once" or "Replay All" buttons.';
+        instructionBanner.appendChild(textNode);
+
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            hideInstructionBanner();
+        }, 5000);
+    }
+
+    // Utility Functions
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     function calculateJsPath(element) {
         let path = [];
         while (element && element.nodeType === Node.ELEMENT_NODE) {
@@ -285,8 +404,13 @@
         const reselectButton = document.createElement('button');
         reselectButton.textContent = 'Reselect ' + name;
         reselectButton.onclick = () => {
-            console.log("Reselecting " + index);
-            getPathForIndex(index);
+            try {
+                console.log("Reselecting " + index);
+                getPathForIndex(index);
+            } catch (error) {
+                console.error('Error in reselect button handler:', error);
+                alert('An error occurred while starting element selection. Check console for details.');
+            }
         };
         container.appendChild(reselectButton);
     });
@@ -294,19 +418,67 @@
     const replayBtn = document.createElement('button');
     replayBtn.textContent = 'Replay All';
     replayBtn.style.display = "block";
-    replayBtn.onclick = replayAll;
+    replayBtn.onclick = async () => {
+        // Prevent multiple simultaneous executions
+        if (replayBtn.disabled) return;
+
+        try {
+            // Disable buttons and show progress
+            replayBtn.disabled = true;
+            replayOnceBtn.disabled = true;
+            replayBtn.textContent = 'Processing...';
+
+            await replayAll();
+        } catch (error) {
+            console.error('Error in replay button handler:', error);
+            alert('An error occurred during batch posting. Check console for details.');
+        } finally {
+            // Re-enable buttons and restore text
+            replayBtn.disabled = false;
+            replayOnceBtn.disabled = false;
+            replayBtn.textContent = 'Replay All';
+        }
+    };
     container.appendChild(replayBtn);
 
     const replayOnceBtn = document.createElement('button');
     replayOnceBtn.textContent = 'Replay Once';
     replayOnceBtn.style.display = "block";
-    replayOnceBtn.onclick = replayOnce;
+    replayOnceBtn.onclick = async () => {
+        // Prevent multiple simultaneous executions
+        if (replayOnceBtn.disabled) return;
+
+        try {
+            // Disable buttons and show progress
+            replayBtn.disabled = true;
+            replayOnceBtn.disabled = true;
+            replayOnceBtn.textContent = 'Processing...';
+
+            await replayOnce();
+            alert('Single group posting completed successfully!');
+        } catch (error) {
+            console.error('Error in replay once button handler:', error);
+            alert('An error occurred during single group posting. Check console for details.');
+        } finally {
+            // Re-enable buttons and restore text
+            replayBtn.disabled = false;
+            replayOnceBtn.disabled = false;
+            replayOnceBtn.textContent = 'Replay Once';
+        }
+    };
     container.appendChild(replayOnceBtn);
 
     const autoBtn = document.createElement('button');
     autoBtn.textContent = 'Start';
-    replayBtn.style.display = "block";
-    autoBtn.onclick = autoAdvanceAll;
+    autoBtn.style.display = "block";
+    autoBtn.onclick = () => {
+        try {
+            autoAdvanceAll();
+        } catch (error) {
+            console.error('Error in auto advance handler:', error);
+            alert('An error occurred while starting element selection. Check console for details.');
+        }
+    };
     container.appendChild(autoBtn);
 
     // Append the container to the body
