@@ -32,8 +32,8 @@
         "Click the SHARE button on the post you want to share",
         "Click 'Share to a group' option",
         "Click in the search box to search for groups",
-        "Click on the first group result that appears",
-        "Click in the post description area to edit it",
+        "Type in Lightsaber and Click on the arrow of first group result that appears",
+        "Click in the post description area, paste in your post description",
         "Click the POST button to share to the group"
     ];
 
@@ -117,6 +117,9 @@
             // Wait 30 seconds before processing next group (except for the last one)
             if (groupName !== groupNames[groupNames.length - 1]) {
                 await delay(30000);
+            } else {
+                await delay(10000);
+                alert("group posting completed");
             }
         }
     }
@@ -240,8 +243,8 @@
         instructionBanner = document.createElement('div');
         instructionBanner.style.position = 'fixed';
         instructionBanner.style.top = '0';
-        instructionBanner.style.left = '0';
-        instructionBanner.style.width = '100%';
+        instructionBanner.style.left = '25vw';
+        instructionBanner.style.width = '50vw';
         instructionBanner.style.backgroundColor = '#4267B2';
         instructionBanner.style.color = 'white';
         instructionBanner.style.padding = '15px';
